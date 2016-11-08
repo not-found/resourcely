@@ -2,6 +2,12 @@
 bin/
 !bin/resourcely-app.xml
 
+# Everything in build except for build.xml, lib-folder and build.properties
+build/
+!build/lib/*
+!build.properties
+!build.xml
+
 # Other files and folders
 .settings/
 
