@@ -1,6 +1,5 @@
 <project default="[compile] swf">
 	<property file="build.properties" />
-	<taskdef resource="flexTasks.tasks" classpath="${sdk.path.local}/ant/lib/flexTasks.jar" />
 
 	<target name="[compile] swf" depends="[set] sdk, [run] tests">
 		<property name="FLEX_HOME" value="${sdk.path}" />
@@ -70,13 +69,14 @@
 		<condition property="sdk.path" value="${sdk.path.local}" else="${sdk.path.alternative}">
 			<isset property="sdk.exists" />
 		</condition>
+		<taskdef resource="flexTasks.tasks" classpath="${sdk.path}/ant/lib/flexTasks.jar" />
 		<antcall target="[download] sdk" />
-		<antcall target="[unzip] sdk" />
+		<antcall target="[uncompress] sdk" />
 		<echo>SDK path is: ${sdk.path}</echo>
 	</target>
 
 	<target name="[check] sdk">
-		<available file="${sdk.path.local}" property="sdk.exists" />
+		<available file="${sdk.path.local}/ss" property="sdk.exists" />
 		<condition property="sdk.notexists">
 			<not>
 				<isset property="sdk.exists" />
@@ -95,11 +95,19 @@
 		<get src="${sdk.url}" dest="${sdk.path.alternative}" verbose="true" skipexisting="true" />
 	</target>
 
-	<target name="[unzip] sdk" depends="[check] os" if="sdk.notexists">
-		<condition property="sdk.archive" value="${sdk.archive.windows}" else="${sdk.archive.unix}">
+	<target name="[uncompress] sdk" depends="[check] os" if="sdk.notexists">
+		<condition property="unzipTarget" value="[unzip] sdk" else="[untar] sdk">
 			<isset property="os.windows" />
 		</condition>
-		<unzip src="${sdk.path.alternative}/${sdk.archive}" dest="${sdk.path.alternative}" overwrite="false"/>
+		<antcall target="${unzipTarget}"/>
+	</target>
+
+	<target name="[unzip] sdk" depends="[check] os">
+		<unzip src="${sdk.path.alternative}/${sdk.archive.windows}" dest="${sdk.path.alternative}" overwrite="false"/>
+	</target>
+
+	<target name="[untar] sdk" depends="[check] os">
+		<untar src="${sdk.path.alternative}/${sdk.archive.unix}" dest="${sdk.path.alternative}" overwrite="false" compression="bzip2"/>
 	</target>
 
 	<target name="[check] os">
