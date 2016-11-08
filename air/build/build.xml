@@ -3,6 +3,7 @@
 
 	<target name="[compile] swf" depends="[set] sdk, [run] tests">
 		<property name="FLEX_HOME" value="${sdk.path}" />
+		<taskdef resource="flexTasks.tasks" classpath="${sdk.path}/ant/lib/flexTasks.jar" />
 		<mxmlc file="${project}/src/de/notfound/resourcely/demo/Demo.as" configname="air" debug="false" static-link-runtime-shared-libraries="true" target-player="23.0" output="${project}/bin/resourcely.swf">
 			<source-path path-element="${project}/src" />
 			<source-path path-element="${project}/test" />
@@ -21,7 +22,7 @@
 		<property name="testResults" value="${project}/bin/testResults" />
 		<delete dir="${testResults}" />
 		<mkdir dir="${testResults}" />
-		<taskdef name="flexunit" classname="org.flexunit.ant.tasks.FlexUnitTask" classpath="${project}\build\lib\flexUnitTasks-4.2.0.jar" />
+		<taskdef name="flexunit" classname="org.flexunit.ant.tasks.FlexUnitTask" classpath="${project}/build/lib/flexUnitTasks-4.2.0.jar" />
 		<flexunit player="air" swf="${project}/bin/resourcely_Test.swf" localTrusted="true" verbose="true" toDir="${testResults}" />
 		<mkdir dir="${testResults}/reports" />
 		<junitreport todir="${testResults}/reports">
@@ -34,6 +35,7 @@
 
 	<target name="[compile] tests swf">
 		<property name="FLEX_HOME" value="${sdk.path}" />
+		<taskdef resource="flexTasks.tasks" classpath="${sdk.path}/ant/lib/flexTasks.jar" />
 		<mxmlc file="${project}/test/de/notfound/resourcely/CITestRunner.as" configname="air" debug="false" static-link-runtime-shared-libraries="true" target-player="22.0" output="${project}/bin/resourcely_Test.swf">
 			<source-path path-element="${project}/src" />
 			<source-path path-element="${project}/test" />
@@ -69,7 +71,6 @@
 		<condition property="sdk.path" value="${sdk.path.local}" else="${sdk.path.alternative}">
 			<isset property="sdk.exists" />
 		</condition>
-		<taskdef resource="flexTasks.tasks" classpath="${sdk.path}/ant/lib/flexTasks.jar" />
 		<antcall target="[download] sdk" />
 		<antcall target="[uncompress] sdk" />
 		<echo>SDK path is: ${sdk.path}</echo>
