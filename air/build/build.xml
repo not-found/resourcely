@@ -1,0 +1,111 @@
+<project default="[compile] swf">
+	<property file="build.properties" />
+	<taskdef resource="flexTasks.tasks" classpath="${sdk.path.local}/ant/lib/flexTasks.jar" />
+
+	<target name="[compile] swf" depends="[set] sdk, [run] tests">
+		<property name="FLEX_HOME" value="${sdk.path}" />
+		<mxmlc file="${project}/src/de/notfound/resourcely/demo/Demo.as" configname="air" debug="false" static-link-runtime-shared-libraries="true" target-player="23.0" output="${project}/bin/resourcely.swf">
+			<source-path path-element="${project}/src" />
+			<source-path path-element="${project}/test" />
+			<library-path file="${sdk.path}/frameworks/libs/air/airglobal.swc" append="true" />
+			<library-path file="${sdk.path}/frameworks/libs/core.swc" append="true" />
+			<library-path file="${sdk.path}/frameworks/libs/air/aircore.swc" append="true" />
+			<library-path file="${sdk.path}/frameworks/libs/air/servicemonitor.swc" append="true" />
+			<library-path file="${sdk.path}/frameworks/locale/en_US" append="true" />
+			<default-size width="550" height="400" />
+			<define name="CONFIG::AUTHOR" value="'Dennis'" />
+			<define name="CONFIG::DEBUG" value="false" />
+		</mxmlc>
+	</target>
+
+	<target name="[run] tests" depends="[compile] tests swf">
+		<property name="testResults" value="${project}/bin/testResults" />
+		<delete dir="${testResults}" />
+		<mkdir dir="${testResults}" />
+		<taskdef name="flexunit" classname="org.flexunit.ant.tasks.FlexUnitTask" classpath="${project}\build\lib\flexUnitTasks-4.2.0.jar" />
+		<flexunit player="air" swf="${project}/bin/resourcely_Test.swf" localTrusted="true" verbose="true" toDir="${testResults}" />
+		<mkdir dir="${testResults}/reports" />
+		<junitreport todir="${testResults}/reports">
+			<fileset dir="${testResults}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${testResults}/reports/html" />
+		</junitreport>
+	</target>
+
+	<target name="[compile] tests swf">
+		<property name="FLEX_HOME" value="${sdk.path}" />
+		<mxmlc file="${project}/test/de/notfound/resourcely/CITestRunner.as" configname="air" debug="false" static-link-runtime-shared-libraries="true" target-player="22.0" output="${project}/bin/resourcely_Test.swf">
+			<source-path path-element="${project}/src" />
+			<source-path path-element="${project}/test" />
+			<library-path file="${sdk.path}/frameworks/libs/air/airglobal.swc" append="true" />
+			<library-path file="${sdk.path}/frameworks/libs/core.swc" append="true" />
+			<library-path file="${sdk.path}/frameworks/libs/air/aircore.swc" append="true" />
+			<library-path file="${sdk.path}/frameworks/libs/air/applicationupdater.swc" append="true" />
+			<library-path file="${sdk.path}/frameworks/libs/air/applicationupdater_ui.swc" append="true" />
+			<library-path file="${sdk.path}/frameworks/libs/air/servicemonitor.swc" append="true" />
+			<library-path file="${project}/lib/flexunit-4.1.0-8-as3_4.1.0.16076.swc" append="true" />
+			<library-path file="${project}/lib/flexunit-4.1.0-8-flex_4.1.0.16076.swc" append="true" />
+			<library-path file="${project}/lib/flexunit-aircilistener-4.1.0-8-4.1.0.16076.swc" append="true" />
+			<library-path file="${project}/lib/flexunit-cilistener-4.1.0-8-4.1.0.16076.swc" append="true" />
+			<library-path file="${project}/lib/flexunit-uilistener-4.1.0-8-4.1.0.16076.swc" append="true" />
+			<library-path file="${sdk.path}/frameworks/locale/en_US" append="true" />
+			<default-size width="1024" height="768" />
+			<define name="CONFIG::AUTHOR" value="'dsa'" />
+			<define name="CONFIG::DEBUG" value="false" />
+		</mxmlc>
+	</target>
+
+	<target name="[clear] bin folder">
+		<echo message="Clearing bin folder." />
+		<delete includeEmptyDirs="true">
+			<fileset dir="${project}/bin">
+				<include name="**/*" />
+				<exclude name="resourcely-app.xml" />
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="[set] sdk" depends="[check] sdk">
+		<condition property="sdk.path" value="${sdk.path.local}" else="${sdk.path.alternative}">
+			<isset property="sdk.exists" />
+		</condition>
+		<antcall target="[download] sdk" />
+		<antcall target="[unzip] sdk" />
+		<echo>SDK path is: ${sdk.path}</echo>
+	</target>
+
+	<target name="[check] sdk">
+		<available file="${sdk.path.local}" property="sdk.exists" />
+		<condition property="sdk.notexists">
+			<not>
+				<isset property="sdk.exists" />
+			</not>
+		</condition>
+	</target>
+
+	<target name="[download] sdk" depends="[check] sdk, [check] os" if="sdk.notexists">
+		<condition property="sdk.url" value="${sdk.url.windows}" else="${sdk.url.unix}">
+			<isset property="os.windows" />
+		</condition>
+		<condition property="sdk.archive" value="${sdk.archive.windows}" else="${sdk.archive.unix}">
+			<isset property="os.windows" />
+		</condition>
+		<mkdir dir="${sdk.path.alternative}" />
+		<get src="${sdk.url}" dest="${sdk.path.alternative}" verbose="true" skipexisting="true" />
+	</target>
+
+	<target name="[unzip] sdk" depends="[check] os" if="sdk.notexists">
+		<condition property="sdk.archive" value="${sdk.archive.windows}" else="${sdk.archive.unix}">
+			<isset property="os.windows" />
+		</condition>
+		<unzip src="${sdk.path.alternative}/${sdk.archive}" dest="${sdk.path.alternative}" overwrite="false"/>
+	</target>
+
+	<target name="[check] os">
+		<condition property="os.windows" value="true">
+			<os family="windows" />
+		</condition>
+	</target>
+
+</project>

@@ -1,9 +1,6 @@
-# Build and Release Folders
+# Everything in bin except AIR descriptor
 bin/
-bin-debug/
-bin-release/
-[Oo]bj/ # FlashDevelop obj
-[Bb]in/ # FlashDevelop bin
+!bin/resourcely-app.xml
 
 # Other files and folders
 .settings/
