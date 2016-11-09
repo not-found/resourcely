@@ -3,6 +3,7 @@ language: objective-c
 before_install:
   - brew update
   - brew install wget
+  - brew install ant
   
 install:
   - wget http://airdownload.adobe.com/air/mac/download/latest/AIRSDK_Compiler.tbz2
