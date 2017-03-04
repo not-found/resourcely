@@ -65,55 +65,5 @@
 			</fileset>
 		</delete>
 	</target>
-
-	<target name="[set] sdk" depends="[check] sdk">
-		<condition property="sdk.path" value="${sdk.path.local}" else="${sdk.path.alternative}">
-			<isset property="sdk.exists" />
-		</condition>
-		<antcall target="[download] sdk" />
-		<antcall target="[uncompress] sdk" />
-		<echo>SDK path is: ${sdk.path}</echo>
-	</target>
-
-	<target name="[check] sdk">
-		<available file="${sdk.path.local}/ss" property="sdk.exists" />
-		<condition property="sdk.notexists">
-			<not>
-				<isset property="sdk.exists" />
-			</not>
-		</condition>
-	</target>
-
-	<target name="[download] sdk" depends="[check] sdk, [check] os" if="sdk.notexists">
-		<condition property="sdk.url" value="${sdk.url.windows}" else="${sdk.url.unix}">
-			<isset property="os.windows" />
-		</condition>
-		<condition property="sdk.archive" value="${sdk.archive.windows}" else="${sdk.archive.unix}">
-			<isset property="os.windows" />
-		</condition>
-		<mkdir dir="${sdk.path.alternative}" />
-		<get src="${sdk.url}" dest="${sdk.path.alternative}" verbose="true" skipexisting="true" />
-	</target>
-
-	<target name="[uncompress] sdk" depends="[check] os" if="sdk.notexists">
-		<condition property="unzipTarget" value="[unzip] sdk" else="[untar] sdk">
-			<isset property="os.windows" />
-		</condition>
-		<antcall target="${unzipTarget}"/>
-	</target>
-
-	<target name="[unzip] sdk" depends="[check] os">
-		<unzip src="${sdk.path.alternative}/${sdk.archive.windows}" dest="${sdk.path.alternative}" overwrite="false"/>
-	</target>
-
-	<target name="[untar] sdk" depends="[check] os">
-		<untar src="${sdk.path.alternative}/${sdk.archive.unix}" dest="${sdk.path.alternative}" overwrite="false" compression="bzip2"/>
-	</target>
-
-	<target name="[check] os">
-		<condition property="os.windows" value="true">
-			<os family="unix" />
-		</condition>
-	</target>
-
+	
 </project>
