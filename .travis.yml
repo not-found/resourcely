@@ -2,7 +2,13 @@ language: objective-c
 
 before_install:
   - brew update
+  - brew install wget
   - brew install ant
+  
+install:
+  - wget http://airdownload.adobe.com/air/mac/download/latest/AIRSDK_Compiler.tbz2
+  - mkdir air/build/sdk
+  - tar -vxjf AIRSDK_Compiler.tbz2 -C air/build/sdk
 
 before_script:
   # set the JAVA_HOME which is not set by default for OSX Travis-CI workers

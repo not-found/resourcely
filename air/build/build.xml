@@ -1,17 +1,17 @@
 <project default="[compile] swf">
 	<property file="build.properties" />
+	<property name="FLEX_HOME" value="${sdk}" />
 
-	<target name="[compile] swf" depends="[set] sdk, [run] tests">
-		<property name="FLEX_HOME" value="${sdk.path}" />
+	<target name="[compile] swf" depends="[run] tests">
 		<taskdef resource="flexTasks.tasks" classpath="${sdk.path}/ant/lib/flexTasks.jar" />
 		<mxmlc file="${project}/src/de/notfound/resourcely/demo/Demo.as" configname="air" debug="false" static-link-runtime-shared-libraries="true" target-player="23.0" output="${project}/bin/resourcely.swf">
 			<source-path path-element="${project}/src" />
 			<source-path path-element="${project}/test" />
-			<library-path file="${sdk.path}/frameworks/libs/air/airglobal.swc" append="true" />
-			<library-path file="${sdk.path}/frameworks/libs/core.swc" append="true" />
-			<library-path file="${sdk.path}/frameworks/libs/air/aircore.swc" append="true" />
-			<library-path file="${sdk.path}/frameworks/libs/air/servicemonitor.swc" append="true" />
-			<library-path file="${sdk.path}/frameworks/locale/en_US" append="true" />
+			<library-path file="${sdk}/frameworks/libs/air/airglobal.swc" append="true" />
+			<library-path file="${sdk}/frameworks/libs/core.swc" append="true" />
+			<library-path file="${sdk}/frameworks/libs/air/aircore.swc" append="true" />
+			<library-path file="${sdk}/frameworks/libs/air/servicemonitor.swc" append="true" />
+			<library-path file="${sdk}/frameworks/locale/en_US" append="true" />
 			<default-size width="550" height="400" />
 			<define name="CONFIG::AUTHOR" value="'Dennis'" />
 			<define name="CONFIG::DEBUG" value="false" />
@@ -34,23 +34,22 @@
 	</target>
 
 	<target name="[compile] tests swf">
-		<property name="FLEX_HOME" value="${sdk.path}" />
-		<taskdef resource="flexTasks.tasks" classpath="${sdk.path}/ant/lib/flexTasks.jar" />
+		<taskdef resource="flexTasks.tasks" classpath="${sdk}/ant/lib/flexTasks.jar" />
 		<mxmlc file="${project}/test/de/notfound/resourcely/CITestRunner.as" configname="air" debug="false" static-link-runtime-shared-libraries="true" target-player="22.0" output="${project}/bin/resourcely_Test.swf">
 			<source-path path-element="${project}/src" />
 			<source-path path-element="${project}/test" />
-			<library-path file="${sdk.path}/frameworks/libs/air/airglobal.swc" append="true" />
-			<library-path file="${sdk.path}/frameworks/libs/core.swc" append="true" />
-			<library-path file="${sdk.path}/frameworks/libs/air/aircore.swc" append="true" />
-			<library-path file="${sdk.path}/frameworks/libs/air/applicationupdater.swc" append="true" />
-			<library-path file="${sdk.path}/frameworks/libs/air/applicationupdater_ui.swc" append="true" />
-			<library-path file="${sdk.path}/frameworks/libs/air/servicemonitor.swc" append="true" />
+			<library-path file="${sdk}/frameworks/libs/air/airglobal.swc" append="true" />
+			<library-path file="${sdk}/frameworks/libs/core.swc" append="true" />
+			<library-path file="${sdk}/frameworks/libs/air/aircore.swc" append="true" />
+			<library-path file="${sdk}/frameworks/libs/air/applicationupdater.swc" append="true" />
+			<library-path file="${sdk}/frameworks/libs/air/applicationupdater_ui.swc" append="true" />
+			<library-path file="${sdk}/frameworks/libs/air/servicemonitor.swc" append="true" />
 			<library-path file="${project}/lib/flexunit-4.1.0-8-as3_4.1.0.16076.swc" append="true" />
 			<library-path file="${project}/lib/flexunit-4.1.0-8-flex_4.1.0.16076.swc" append="true" />
 			<library-path file="${project}/lib/flexunit-aircilistener-4.1.0-8-4.1.0.16076.swc" append="true" />
 			<library-path file="${project}/lib/flexunit-cilistener-4.1.0-8-4.1.0.16076.swc" append="true" />
 			<library-path file="${project}/lib/flexunit-uilistener-4.1.0-8-4.1.0.16076.swc" append="true" />
-			<library-path file="${sdk.path}/frameworks/locale/en_US" append="true" />
+			<library-path file="${sdk}/frameworks/locale/en_US" append="true" />
 			<default-size width="1024" height="768" />
 			<define name="CONFIG::AUTHOR" value="'dsa'" />
 			<define name="CONFIG::DEBUG" value="false" />
