@@ -113,7 +113,7 @@
 
 	<target name="[check] os">
 		<condition property="os.windows" value="true">
-			<os family="windows" />
+			<os family="unix" />
 		</condition>
 	</target>
 
