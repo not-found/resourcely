@@ -1,12 +1,5 @@
-package de.notfound.resourcely.file
+package de.notfound.resourcely.file.type
 {
-	import de.notfound.resourcely.file.type.FileType;
-	import de.notfound.resourcely.file.type.FileTypeSignature;
-	import de.notfound.resourcely.file.type.GIF87aSignature;
-	import de.notfound.resourcely.file.type.GIF89aSignature;
-	import de.notfound.resourcely.file.type.JPGSignature;
-	import de.notfound.resourcely.file.type.PNGSignature;
-
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.ProgressEvent;
@@ -35,7 +28,6 @@ package de.notfound.resourcely.file
 		 * Identifies the image filetype.
 		 * 
 		 * @param urlRequest A reference to the file.
-		 * @return Returns either ImageFileType.JPG, ImageFileType.GIF, ImageFileType.PNG or ImageFileType.UNKNOWN
 		 */
 		public function identifiy(urlRequest : URLRequest) : void
 		{
@@ -57,9 +49,8 @@ package de.notfound.resourcely.file
 				{
 					if(_signatures[i].match(byte))
 					{
-						urlStream.close();
 						_type = _signatures[i].fileType;
-						dispatchEvent(new Event(Event.COMPLETE));
+						complete(urlStream);
 						break outer;
 					}
 				}
@@ -69,11 +60,18 @@ package de.notfound.resourcely.file
 		private function handleFileComplete(event : Event) : void
 		{
 			var urlStream : URLStream = URLStream(event.target);
+			complete(urlStream);
+		}
+		
+		private function complete(urlStream : URLStream) : void
+		{
 			urlStream.close();
+			urlStream.removeEventListener(ProgressEvent.PROGRESS, handleFileProgress);
+			urlStream.removeEventListener(Event.COMPLETE, handleFileComplete);
 			
 			dispatchEvent(new Event(Event.COMPLETE));
 		}
-
+		
 		public function get type() : uint
 		{
 			return _type;

@@ -1,25 +1,30 @@
 package de.notfound.resourcely.demo
 {
-	import flash.net.URLRequest;
-	import de.notfound.resourcely.file.ImageFileTypeIdentifier;
+	import flash.utils.getTimer;
+	import de.notfound.resourcely.file.dimension.ImageFileDimensionExtractor;
 
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.net.URLRequest;
 
 	public class Demo extends Sprite
 	{
+		private var _time : int;
+
 		public function Demo()
 		{
-			var imageFileTypeIdentifier : ImageFileTypeIdentifier = new ImageFileTypeIdentifier();
-			imageFileTypeIdentifier.addEventListener(Event.COMPLETE, handleComplete);
-			
-			imageFileTypeIdentifier.identifiy(new URLRequest("img.png"));
+			var imageDimensionExtractor : ImageFileDimensionExtractor = new ImageFileDimensionExtractor();
+			imageDimensionExtractor.addEventListener(Event.COMPLETE, handleComplete);
+			_time = getTimer();
+			imageDimensionExtractor.extractDimension(new URLRequest("img.jpg"));
 		}
 
 		private function handleComplete(event : Event) : void
 		{
-			var target : ImageFileTypeIdentifier = ImageFileTypeIdentifier(event.target);
-			trace(target.type);
+			var target : ImageFileDimensionExtractor = ImageFileDimensionExtractor(event.target);
+			trace(getTimer() - _time);
+			trace(target.width);
+			trace(target.height);
 		}
 	}
 }
