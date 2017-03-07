@@ -1,7 +1,12 @@
 package de.notfound.resourcely.file.dimension
 {
 	import flash.utils.ByteArray;
-
+	
+	/**
+	 * Handles dimension extraction for a JPG file.
+	 * 
+	 * @see DimensionExtractionStrategy
+	 */
 	public class JPGDimensionExtractionStrategy extends DimensionExtractionStrategy
 	{
 		private static const MODE_MARKER_SEARCH : uint = 0;

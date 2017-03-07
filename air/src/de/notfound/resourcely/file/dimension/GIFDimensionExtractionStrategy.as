@@ -4,6 +4,11 @@ package de.notfound.resourcely.file.dimension
 	import de.notfound.resourcely.file.type.GIF87aSignature;
 	import de.notfound.resourcely.file.type.GIF89aSignature;
 
+	/**
+	 * Handles dimension extraction for a GIF file.
+	 * 
+	 * @see DimensionExtractionStrategy
+	 */
 	public class GIFDimensionExtractionStrategy extends DimensionExtractionStrategy
 	{
 		private var _gif89aSignature : GIF89aSignature;

@@ -28,6 +28,7 @@ package de.notfound.resourcely.file.type
 		 * Identifies the image filetype.
 		 * 
 		 * @param urlRequest A reference to the file.
+		 * @throws flash.events.Event Throws Event.COMPLETE after the identification process completed.
 		 */
 		public function identifiy(urlRequest : URLRequest) : void
 		{

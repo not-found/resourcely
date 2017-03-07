@@ -8,7 +8,12 @@ package de.notfound.resourcely.file.dimension
 
 	import flash.events.Event;
 	import flash.net.URLRequest;
-
+	
+	/**
+	 * Extracts the image dimensions for GIF, PNG and JPG files by choosing a appropriate DimensionExtractionStrategy.
+	 * 
+	 * @see DimensionExtractionStrategy
+	 */
 	public class ImageFileDimensionExtractor extends EventDispatcher
 	{
 		private var _imageTypeIdentifier : ImageFileTypeIdentifier;
@@ -20,7 +25,12 @@ package de.notfound.resourcely.file.dimension
 			_imageTypeIdentifier = new ImageFileTypeIdentifier();
 			_imageTypeIdentifier.addEventListener(Event.COMPLETE, handleFileIdentificationComplete);
 		}
-
+		
+		/**
+		 * Extracts dimension for a given image file.
+		 * @param urlRequest A reference to an image file.
+		 * @throws flash.events.Event Thows Event.COMPLETE after dimension extraction.
+		 */
 		public function extractDimension(urlRequest : URLRequest) : void
 		{
 			_urlRequest = urlRequest;
@@ -78,11 +88,17 @@ package de.notfound.resourcely.file.dimension
 			dispatchEvent(new Event(Event.COMPLETE));
 		}
 		
+		/**
+		 * Provides access to the image width after extraction.
+		 */
 		public function get width() : int
 		{
 			return _extractionStrategy.width;
 		}
-
+		
+		/**
+		 * Provides access to the image height after extraction.
+		 */
 		public function get height() : int
 		{
 			return _extractionStrategy.height;

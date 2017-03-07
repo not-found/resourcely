@@ -1,5 +1,8 @@
 package de.notfound.resourcely.file.type
 {
+	/**
+	 * Defines constants representing file types such as JPG, PNG or GIF.
+	 */
 	public class FileType
 	{
 		public static const TYPE_UNKNOWN : int = 0;

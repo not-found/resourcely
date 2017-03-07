@@ -3,7 +3,12 @@ package de.notfound.resourcely.file.dimension
 	import de.notfound.resourcely.file.type.PNGSignature;
 
 	import flash.utils.ByteArray;
-
+	
+	/**
+	 * Handles dimension extraction for a PNG file.
+	 * 
+	 * @see DimensionExtractionStrategy
+	 */
 	public class PNGDimensionExtractionStrategy extends DimensionExtractionStrategy
 	{
 		private var _pngSignature : PNGSignature;

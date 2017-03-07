@@ -1,6 +1,10 @@
 package de.notfound.resourcely.file.type
 {
 	import flash.utils.ByteArray;
+	
+	/**
+	 * Defines a byte sequence for a GIF87a header.
+	 */
 	public class GIF87aSignature extends FileTypeSignature
 	{
 		public function GIF87aSignature() {
