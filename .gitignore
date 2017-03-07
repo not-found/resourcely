@@ -1,6 +1,6 @@
 # Everything in bin except AIR descriptor
-bin/
-!bin/resourcely-app.xml
+**/bin/*
+!**/bin/test
 
 # Everything in build except for build.xml, lib-folder and build.properties
 build/
