@@ -1,14 +1,14 @@
 package de.notfound.resourcely.file.dimension
 {
-	import flash.events.ProgressEvent;
-	import flash.net.URLStream;
-	import flash.events.EventDispatcher;
 	import de.notfound.resourcely.file.type.FileType;
 	import de.notfound.resourcely.file.type.ImageFileTypeIdentifier;
 
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	import flash.events.ProgressEvent;
 	import flash.net.URLRequest;
-	
+	import flash.net.URLStream;
+
 	/**
 	 * Extracts the image dimensions for GIF, PNG and JPG files by choosing a appropriate DimensionExtractionStrategy.
 	 * 
@@ -19,13 +19,13 @@ package de.notfound.resourcely.file.dimension
 		private var _imageTypeIdentifier : ImageFileTypeIdentifier;
 		private var _urlRequest : URLRequest;
 		private var _extractionStrategy : DimensionExtractionStrategy;
-		
+
 		public function ImageFileDimensionExtractor()
 		{
 			_imageTypeIdentifier = new ImageFileTypeIdentifier();
 			_imageTypeIdentifier.addEventListener(Event.COMPLETE, handleFileIdentificationComplete);
 		}
-		
+
 		/**
 		 * Extracts dimension for a given image file.
 		 * @param urlRequest A reference to an image file.
@@ -36,12 +36,15 @@ package de.notfound.resourcely.file.dimension
 			_urlRequest = urlRequest;
 			_imageTypeIdentifier.identifiy(_urlRequest);
 		}
-		
+
 		private function handleFileIdentificationComplete(event : Event) : void
 		{
-			if(_imageTypeIdentifier.type == FileType.TYPE_UNKNOWN)
-				throw new Error("Image file type unknown. Couldn't detect image type based on file header information.");
-			
+			if (_imageTypeIdentifier.type == FileType.TYPE_UNKNOWN)
+			{
+				complete();
+				return;
+			}
+
 			switch (_imageTypeIdentifier.type)
 			{
 				case FileType.TYPE_GIF:
@@ -64,11 +67,11 @@ package de.notfound.resourcely.file.dimension
 		private function handleStreamProgress(event : ProgressEvent) : void
 		{
 			var urlStream : URLStream = URLStream(event.target);
-			
+
 			outer:
-			while(urlStream.bytesAvailable > 0)
+			while (urlStream.bytesAvailable > 0)
 			{
-				if(_extractionStrategy.process(urlStream.readByte()))
+				if (_extractionStrategy.process(urlStream.readByte()))
 				{
 					complete(urlStream);
 					break outer;
@@ -79,29 +82,30 @@ package de.notfound.resourcely.file.dimension
 		private function handleStreamComplete(event : Event) : void
 		{
 			var urlStream : URLStream = URLStream(event.target);
-			complete(urlStream); 
+			complete(urlStream);
 		}
-		
-		private function complete(urlStream : URLStream) : void
+
+		private function complete(urlStream : URLStream = null) : void
 		{
-			urlStream.close();
+			if (urlStream != null)
+				urlStream.close();
 			dispatchEvent(new Event(Event.COMPLETE));
 		}
-		
+
 		/**
 		 * Provides access to the image width after extraction.
 		 */
 		public function get width() : int
 		{
-			return _extractionStrategy.width;
+			return _extractionStrategy != null ? _extractionStrategy.width : 0;
 		}
-		
+
 		/**
 		 * Provides access to the image height after extraction.
 		 */
 		public function get height() : int
 		{
-			return _extractionStrategy.height;
+			return _extractionStrategy != null ? _extractionStrategy.height : 0;
 		}
 	}
 }
