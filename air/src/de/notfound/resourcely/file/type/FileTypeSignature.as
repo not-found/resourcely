@@ -29,7 +29,10 @@ package de.notfound.resourcely.file.type
 			var signatureByte : int = _signature.readByte();
 			if(signatureByte == byte)
 			{
-				return _signature.bytesAvailable == 0;
+				var matched : Boolean =_signature.bytesAvailable == 0;
+				if(matched)
+					_signature.position = 0;
+				return matched;
 			}else
 			{
 				_signature.position = 0;

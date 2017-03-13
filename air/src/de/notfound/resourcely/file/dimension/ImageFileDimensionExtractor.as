@@ -19,11 +19,13 @@ package de.notfound.resourcely.file.dimension
 		private var _imageTypeIdentifier : ImageFileTypeIdentifier;
 		private var _urlRequest : URLRequest;
 		private var _extractionStrategy : DimensionExtractionStrategy;
-
+		private var _working : Boolean;
+		
 		public function ImageFileDimensionExtractor()
 		{
 			_imageTypeIdentifier = new ImageFileTypeIdentifier();
 			_imageTypeIdentifier.addEventListener(Event.COMPLETE, handleFileIdentificationComplete);
+			_working = false;
 		}
 
 		/**
@@ -34,6 +36,7 @@ package de.notfound.resourcely.file.dimension
 		public function extractDimension(urlRequest : URLRequest) : void
 		{
 			_urlRequest = urlRequest;
+			_working = true;
 			_imageTypeIdentifier.identifiy(_urlRequest);
 		}
 
@@ -89,6 +92,7 @@ package de.notfound.resourcely.file.dimension
 		{
 			if (urlStream != null)
 				urlStream.close();
+			_working = false;
 			dispatchEvent(new Event(Event.COMPLETE));
 		}
 
@@ -106,6 +110,11 @@ package de.notfound.resourcely.file.dimension
 		public function get height() : int
 		{
 			return _extractionStrategy != null ? _extractionStrategy.height : 0;
+		}
+
+		public function get working() : Boolean
+		{
+			return _working;
 		}
 	}
 }
