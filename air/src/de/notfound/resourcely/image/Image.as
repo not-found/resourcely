@@ -12,16 +12,14 @@ package de.notfound.resourcely.image
 	public class Image extends Sprite
 	{
 		private var _context : Resourcely;
-		private var _density : Density;
 		private var _fileDimensions : Rectangle;
 		
 		private var _bitmap : Bitmap;
 		private var _bitmapData : BitmapData;
 		private var _filler : Sprite;
-		
-		public function Image(context : Resourcely, density : Density)
+
+		public function Image(context : Resourcely)
 		{
-			_density = density;
 			_context = context;
 			
 			_bitmap = new Bitmap();
@@ -44,11 +42,6 @@ package de.notfound.resourcely.image
 				removeChild(_bitmap);
 			if(!contains(_filler))
 				addChild(_filler);
-		}
-		
-		public function get density() : Density
-		{
-			return _density;
 		}
 
 		public function set fileDimensions(dimensions : Rectangle) : void

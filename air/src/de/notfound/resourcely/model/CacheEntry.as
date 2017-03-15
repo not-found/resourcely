@@ -1,26 +1,22 @@
 package de.notfound.resourcely.model
 {
-	import flash.filesystem.File;
-	import flash.geom.Rectangle;
-
 	import de.notfound.resourcely.image.Image;
 
 	import flash.display.BitmapData;
+	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
 
 	public class CacheEntry
 	{
-		private var _file : File;
 		private var _fileDimensions : Rectangle;
 		private var _data : BitmapData;
 		private var _estimatedSize : Number;
 		private var _timestamp : int;
 		private var _refs : Dictionary;
 
-		public function CacheEntry(file : File)
+		public function CacheEntry()
 		{
-			_file = file;
 			_timestamp = getTimer();
 			_refs = new Dictionary(true);
 		}

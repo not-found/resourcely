@@ -1,10 +1,10 @@
 package de.notfound.resourcely.demo
 {
-	import flash.net.URLRequest;
+	import flash.display.StageScaleMode;
+	import flash.display.StageAlign;
 	import de.notfound.resourcely.Resourcely;
 	import de.notfound.resourcely.image.Image;
 
-	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.utils.getTimer;
@@ -15,20 +15,27 @@ package de.notfound.resourcely.demo
 
 		public function Demo()
 		{
-			test1();
+			addEventListener(Event.ENTER_FRAME, handleEnterFrame);
 		}
 
-		private function test2() : void
+		private function handleEnterFrame(event : Event) : void
 		{
-			_time = getTimer();
-			var loader : Loader = new Loader();
-			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handleLoadComplete);
-			loader.load(new URLRequest("/res/ldpi/img.png"));
+			removeEventListener(Event.ENTER_FRAME, handleEnterFrame);
+			
+			init();
+		}
+
+		private function init() : void
+		{
+			stage.align = StageAlign.TOP_LEFT;
+			stage.scaleMode = StageScaleMode.NO_SCALE;
+			
+			test1();
 		}
 
 		private function test1() : void
 		{
-			Resourcely.getInstance().init();
+			Resourcely.getInstance().init(stage);
 
 			_time = getTimer();
 			var img1 : Image = Resourcely.getInstance().getImage("img.png");
