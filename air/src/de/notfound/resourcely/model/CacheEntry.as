@@ -14,11 +14,15 @@ package de.notfound.resourcely.model
 		private var _estimatedSize : Number;
 		private var _timestamp : int;
 		private var _refs : Dictionary;
-
+		
+		public static var num : uint = 0;
+		
 		public function CacheEntry()
 		{
 			_timestamp = getTimer();
 			_refs = new Dictionary(true);
+			
+			trace(++num);
 		}
 
 		public function addReference(image : Image) : void
@@ -32,22 +36,34 @@ package de.notfound.resourcely.model
 			delete _refs[image];
 		}
 
+		public function clear() : void
+		{
+			_fileDimensions = null;
+			for (var image : Image in _refs)
+			{
+				image.clear();
+				removeReference(image);
+			}
+			_data.dispose();
+			_data = null;
+		}
+
 		public function get data() : BitmapData
 		{
 			_timestamp = getTimer();
 			return _data;
 		}
-		
+
 		public function set data(bitmapData : BitmapData) : void
 		{
 			_data = bitmapData;
-			
+
 			for (var ref : Image in _refs)
 			{
 				ref.bitmapData = bitmapData;
 			}
 		}
-		
+
 		public function get timestamp() : int
 		{
 			return _timestamp;
@@ -67,7 +83,7 @@ package de.notfound.resourcely.model
 		{
 			return _fileDimensions;
 		}
-		
+
 		public function set fileDimensions(fileDimensions : Rectangle) : void
 		{
 			_fileDimensions = fileDimensions;

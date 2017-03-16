@@ -1,5 +1,6 @@
 package de.notfound.resourcely
 {
+	import de.notfound.resourcely.util.DeviceUtil;
 	import de.notfound.resourcely.config.ResourcelyConfig;
 	import de.notfound.resourcely.config.ResourcelyConfigBuilder;
 	import de.notfound.resourcely.file.dimension.ImageFileDimensionExtractor;
@@ -25,18 +26,20 @@ package de.notfound.resourcely
 	{
 		private static var _instance : Resourcely;
 		private static var _allowInstance : Boolean = false;
+		
 		private var _config : ResourcelyConfig;
 		private var _densities : Vector.<Density>;
 		private var _cache : Dictionary;
+		private var _paths : Dictionary;
 		private var _imageFileMapping : Dictionary;
 		private var _imageDimensionExtractor : ImageFileDimensionExtractor;
 		private var _imageDimensionExtractorQueue : Array;
 		private var _loader : Loader;
 		private var _loaderQueue : Array;
 		private var _loaderWorking : Boolean;
-		private var _orientation : uint;
+		private var _orientation : int;
 		private var _stage : Stage;
-
+		
 		public function Resourcely()
 		{
 			if (!_allowInstance)
@@ -44,12 +47,14 @@ package de.notfound.resourcely
 
 			_densities = new Vector.<Density>();
 			_cache = new Dictionary();
+			_paths = new Dictionary();
 			_imageFileMapping = new Dictionary(true);
 
 			_imageDimensionExtractor = new ImageFileDimensionExtractor();
 			_imageDimensionExtractor.addEventListener(Event.COMPLETE, handleDimensionExtractionComplete);
 			_imageDimensionExtractorQueue = new Array();
-
+			_orientation = Orientation.PORTRAIT;
+			
 			_loader = new Loader();
 			_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handleLoadDataComplete);
 			_loaderQueue = new Array();
@@ -104,6 +109,9 @@ package de.notfound.resourcely
 
 		private function resolvePath(fileName : String, orientation : int) : Path
 		{
+			if(_paths[fileName + orientation] != null)
+				return _paths[fileName + orientation];
+				
 			var resDir : File = _config.resourceDirectory;
 			var postFix : String = orientation == Orientation.LANDSCAPE ? Orientation.POSTIFX_LANDSCAPE : Orientation.POSTIFX_PORTRAIT;
 
@@ -121,7 +129,10 @@ package de.notfound.resourcely
 							if (FileUtil.isImageFile(file.extension) == false)
 								throw new Error("Couldn't load " + file.nativePath + " because it isn't an image file.");
 						}
-						return new Path(file, _densities[i]);
+						
+						var path : Path = new Path(file, _densities[i]);
+						_paths[fileName + orientation] = path;
+						return path;
 					}
 				}
 			}
@@ -138,7 +149,7 @@ package de.notfound.resourcely
 			registerReference(image);
 
 			var file : File = _imageFileMapping[image];
-			var cacheEntry : CacheEntry = _cache[file.name];
+			var cacheEntry : CacheEntry = _cache[file];
 
 			if (cacheEntry.fileDimensions == null)
 			{
@@ -176,7 +187,7 @@ package de.notfound.resourcely
 			if (_imageDimensionExtractorQueue.length > 0 && !_imageDimensionExtractor.working)
 			{
 				var file : File = _imageDimensionExtractorQueue[0];
-				_imageDimensionExtractor.extractDimension(new URLRequest(file.nativePath));
+				_imageDimensionExtractor.extractDimension(new URLRequest(file.url));
 			}
 			else if (_imageDimensionExtractorQueue.length == 0)
 			{
@@ -189,19 +200,18 @@ package de.notfound.resourcely
 			if (_loaderQueue.length > 0 && !_loaderWorking)
 			{
 				var file : File = _loaderQueue[0];
-				_loader.load(new URLRequest(file.nativePath));
+				_loader.load(new URLRequest(file.url));
 			}
 		}
 
 		private function initStage(stage : Stage) : void
 		{
 			_stage = stage;
-			if (Stage.supportsOrientationChange)
-				_stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, handleStageOrientationChange);
+			_stage.addEventListener(Event.RESIZE, handleStageOrientationChange)
 			setOrientation();
 		}
 
-		private function handleStageOrientationChange(event : StageOrientationEvent) : void
+		private function handleStageOrientationChange(event : Event) : void
 		{
 			setOrientation();
 			refresh();
@@ -209,7 +219,11 @@ package de.notfound.resourcely
 
 		private function setOrientation() : void
 		{
-			_orientation = _stage.fullScreenWidth > _stage.fullScreenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+			if(DeviceUtil.isDesktop())
+				_orientation = Orientation.PORTRAIT;
+			else
+				_orientation = _stage.fullScreenWidth > _stage.fullScreenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+				
 		}
 
 		private function initDensities() : void
@@ -226,18 +240,15 @@ package de.notfound.resourcely
 
 		private function refresh() : void
 		{
-			var files : Dictionary = new Dictionary();
 			for (var image : Image in _imageFileMapping)
 			{
 				var oldFile : File = _imageFileMapping[image];
-
-				if (files[oldFile.name] == null)
-					files[oldFile.name] = resolveOrientation(oldFile.name).file;
-				var newFile : File = files[oldFile.name];
-
+				var newFile : File = resolveOrientation(oldFile.name).file;
+				var cacheEntry : CacheEntry = _cache[oldFile];
+				
 				_imageFileMapping[image] = newFile;
-
-				image.clear();
+				
+				cacheEntry.clear();
 				load(image);
 			}
 		}
@@ -245,17 +256,17 @@ package de.notfound.resourcely
 		private function registerReference(image : Image) : void
 		{
 			var file : File = _imageFileMapping[image];
-			if (_cache[file.name] == null)
-				_cache[file.name] = new CacheEntry();
+			if (_cache[file] == null)
+				_cache[file] = new CacheEntry();
 
-			var cacheEntry : CacheEntry = _cache[file.name];
+			var cacheEntry : CacheEntry = _cache[file];
 			cacheEntry.addReference(image);
 		}
 
 		private function removeReference(image : Image) : void
 		{
 			var file : File = _imageFileMapping[image];
-			var cacheEntry : CacheEntry = _cache[file.name];
+			var cacheEntry : CacheEntry = _cache[file];
 			cacheEntry.removeReference(image);
 		}
 
@@ -278,10 +289,7 @@ package de.notfound.resourcely
 			var loaderInfo : LoaderInfo = LoaderInfo(event.target);
 
 			var file : File = _loaderQueue.shift();
-			var cacheEntry : CacheEntry = _cache[file.name];
-
-			if (cacheEntry.data != null)
-				cacheEntry.data.dispose();
+			var cacheEntry : CacheEntry = _cache[file];
 
 			cacheEntry.data = Bitmap(loaderInfo.content).bitmapData;
 			extractDimensions();
@@ -290,7 +298,7 @@ package de.notfound.resourcely
 		private function handleDimensionExtractionComplete(event : Event) : void
 		{
 			var file : File = _imageDimensionExtractorQueue.shift();
-			var cacheEntry : CacheEntry = _cache[file.name];
+			var cacheEntry : CacheEntry = _cache[file];
 			var dimensions : Rectangle = new Rectangle(0, 0, _imageDimensionExtractor.width, _imageDimensionExtractor.height);
 
 			cacheEntry.fileDimensions = dimensions;

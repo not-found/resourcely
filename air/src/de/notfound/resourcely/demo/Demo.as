@@ -38,7 +38,7 @@ package de.notfound.resourcely.demo
 			Resourcely.getInstance().init(stage);
 
 			_time = getTimer();
-			var img1 : Image = Resourcely.getInstance().getImage("img.png");
+			var img1 : Image = Resourcely.getInstance().getImage("img.jpg");
 			img1.addEventListener(Event.COMPLETE, handleLoadComplete);
 			addChild(img1);
 		}

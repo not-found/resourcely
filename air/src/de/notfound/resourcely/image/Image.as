@@ -56,7 +56,7 @@ package de.notfound.resourcely.image
 		private function createFiller() : Sprite
 		{
 			var filler : Sprite = new Sprite();
-			filler.graphics.beginFill(0xff0000, 1.0);
+			filler.graphics.beginFill(0xff0000, 0.0);
 			filler.graphics.drawRect(0, 0, 100, 100);
 			filler.graphics.endFill();
 			
