@@ -85,7 +85,7 @@ package de.notfound.resourcely
 		 */
 		public function init(stage : Stage, config : ResourcelyConfig = null) : void
 		{
-			_config = config != null ? config : ResourcelyConfigBuilder.getDefault();
+			_config = config != null ? config : ResourcelyConfigBuilder.getDefault().build();
 
 			initStage(stage);
 			initDensities();
