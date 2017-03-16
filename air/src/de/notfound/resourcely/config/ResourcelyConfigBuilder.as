@@ -12,9 +12,25 @@ package de.notfound.resourcely.config
 	 */
 	public class ResourcelyConfigBuilder
 	{
-		private static const RESOURCE_PATH_DEFAULT : File = File.applicationDirectory.resolvePath("res");
-		private static const RESOURCE_LOCATION_STRATEGY_DEFAULT : ResourceLocationStrategy = new DefaultResourceLocationStrategy();
-		private static const RESOURCE_SCALING_STRATEGY_DEFAULT : ResourceScalingStrategy = new DefaultResourceScalingStrategy();
+		/**
+		 * Default resource path.
+		 */
+		public static const RESOURCE_PATH_DEFAULT : File = File.applicationDirectory.resolvePath("res");
+		
+		/**
+		 * Default resource location strategy.
+		 */
+		public static const RESOURCE_LOCATION_STRATEGY_DEFAULT : ResourceLocationStrategy = new DefaultResourceLocationStrategy();
+		
+		/**
+		 * Default resource scaling strategy.
+		 */
+		public static const RESOURCE_SCALING_STRATEGY_DEFAULT : ResourceScalingStrategy = new DefaultResourceScalingStrategy();
+		
+		/**
+		 * Default device dpi value.
+		 */
+		public static const DEVICE_DPI_DEFAULT : Number = Capabilities.screenDPI;
 		
 		private var _config : ResourcelyConfig;
 
@@ -73,17 +89,16 @@ package de.notfound.resourcely.config
 		}
 		
 		/**
-		 * Creates a config with default configuration.
-		 * @return ResourcelyConfig with default configuration.
+		 * Creates a config builder with default configuration.
+		 * @return ResourcelyConfigBuilder with default configuration.
 		 */
-		public static function getDefault() : ResourcelyConfig
+		public static function getDefault() : ResourcelyConfigBuilder
 		{
 			var builder : ResourcelyConfigBuilder = new ResourcelyConfigBuilder();
 			return builder.setResourcePath(RESOURCE_PATH_DEFAULT)
 			.setResourceLocationStrategy(RESOURCE_LOCATION_STRATEGY_DEFAULT)
 			.setResourceScalingStrategy(RESOURCE_SCALING_STRATEGY_DEFAULT)
-			.setDeviceDpi(Capabilities.screenDPI)
-			.build();
+			.setDeviceDpi(DEVICE_DPI_DEFAULT);
 		}
 	}
 }
