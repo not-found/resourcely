@@ -2,6 +2,10 @@ package de.notfound.resourcely.model
 {
 	import flash.filesystem.File;
 
+	/**
+	 * Internal class used to save a pair consisting of a file and a density instance.
+	 * @private
+	 */
 	public class Path
 	{
 		private var _file : File;

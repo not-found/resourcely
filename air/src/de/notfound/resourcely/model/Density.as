@@ -1,5 +1,10 @@
 package de.notfound.resourcely.model
 {
+	/**
+	 * Contains some default values for dpi classification based on the categories 
+	 * introduced by Google in the Android framework. Every qualifier corresponds to a possible
+	 * folder within the resource folder containing images in this dpi class.
+	 */
 	public class Density
 	{
 		public static const LDPI : uint = 120;

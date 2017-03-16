@@ -6,14 +6,8 @@ package de.notfound.resourcely.file.dimension
 	 */
 	public class DimensionExtractionStrategy
 	{
-		/**
-		 * Contains the image width after extraction finished.
-		 */
 		protected var _width : int;
 		
-		/**
-		 * Contains the image height after extraction finished.
-		 */
 		protected var _height : int;
 		
 		/**
@@ -26,11 +20,17 @@ package de.notfound.resourcely.file.dimension
 			throw new Error("This method has to be implemented.");
 		}
 
+		/**
+		 * Contains the image width after extraction finished.
+		 */
 		public function get width() : int
 		{
 			return _width;
 		}
 
+		/**
+		 * Contains the image height after extraction finished.
+		 */
 		public function get height() : int
 		{
 			return _height;

@@ -1,6 +1,5 @@
 package de.notfound.resourcely
 {
-	import de.notfound.resourcely.util.DeviceUtil;
 	import de.notfound.resourcely.config.ResourcelyConfig;
 	import de.notfound.resourcely.config.ResourcelyConfigBuilder;
 	import de.notfound.resourcely.file.dimension.ImageFileDimensionExtractor;
@@ -9,6 +8,7 @@ package de.notfound.resourcely
 	import de.notfound.resourcely.model.Density;
 	import de.notfound.resourcely.model.Orientation;
 	import de.notfound.resourcely.model.Path;
+	import de.notfound.resourcely.util.DeviceUtil;
 	import de.notfound.resourcely.util.FileUtil;
 
 	import flash.display.Bitmap;
@@ -16,7 +16,6 @@ package de.notfound.resourcely
 	import flash.display.LoaderInfo;
 	import flash.display.Stage;
 	import flash.events.Event;
-	import flash.events.StageOrientationEvent;
 	import flash.filesystem.File;
 	import flash.geom.Rectangle;
 	import flash.net.URLRequest;
@@ -40,6 +39,10 @@ package de.notfound.resourcely
 		private var _orientation : int;
 		private var _stage : Stage;
 		
+		/**
+		 * Used to load image resources. Resourcely is meant to be used as signleton, 
+		 * so you can't create instances from it and should use getInstance() instead.
+		 */
 		public function Resourcely()
 		{
 			if (!_allowInstance)
@@ -60,7 +63,10 @@ package de.notfound.resourcely
 			_loaderQueue = new Array();
 			_loaderWorking = false;
 		}
-
+		
+		/**
+		 * Returns a resourcely instance.
+		 */
 		public static function getInstance() : Resourcely
 		{
 			if (_instance == null)
@@ -71,7 +77,12 @@ package de.notfound.resourcely
 
 			return _instance;
 		}
-
+		
+		/**
+		 * Use this to initialize resourcely. This is needed to it'll be able to detect device orientation changes.
+		 * @param stage The stage object belonging to the display list.
+		 * @param config The config to control resourcelys behavior. It'll use a standard config by default.
+		 */
 		public function init(stage : Stage, config : ResourcelyConfig = null) : void
 		{
 			_config = config != null ? config : ResourcelyConfigBuilder.getDefault();
@@ -79,7 +90,12 @@ package de.notfound.resourcely
 			initStage(stage);
 			initDensities();
 		}
-
+		
+		/**
+		 * Locates and returns an image matching the fileName supplied depending on the devices dpi and orientation.
+		 * @param fileName The file name of the image file including extension. For example: <code>img.jpg</code>
+		 * @return An Image instance which is linked to the image file identified by the fileName parameter.
+		 */
 		public function getImage(fileName : String) : Image
 		{
 			var path : Path = resolveOrientation(fileName);
@@ -143,7 +159,11 @@ package de.notfound.resourcely
 
 			return null;
 		}
-
+		
+		/**
+		 * Calling this method will cause resourcely to load the image file linked to the image instance.
+		 * @param image The image which should its image data get loaded.
+		 */		
 		public function load(image : Image) : void
 		{
 			registerReference(image);

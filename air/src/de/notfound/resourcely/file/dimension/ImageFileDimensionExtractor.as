@@ -111,7 +111,10 @@ package de.notfound.resourcely.file.dimension
 		{
 			return _extractionStrategy != null ? _extractionStrategy.height : 0;
 		}
-
+		
+		/**
+		 * @private
+		 */
 		public function get working() : Boolean
 		{
 			return _working;

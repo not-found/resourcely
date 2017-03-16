@@ -2,6 +2,11 @@ package de.notfound.resourcely.config.strategy
 {
 	import de.notfound.resourcely.model.Density;
 
+	/**
+	 * Implements the abstract class ResourceLocationStrategy.
+	 * Resourcely will use the density folder which is the next best guess for the current Capabilities.screenDPI value.
+	 * If it doesn't exist, it'll take the next lower one.
+	 */
 	public class DefaultResourceLocationStrategy extends ResourceLocationStrategy
 	{
 		override public function getOrder(densities : Vector.<Density>) : Vector.<Density>

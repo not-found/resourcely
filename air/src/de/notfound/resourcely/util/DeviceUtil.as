@@ -2,6 +2,9 @@ package de.notfound.resourcely.util
 {
 	import flash.system.Capabilities;
 
+	/**
+	 * A little util to detect the current operating system and whether it's a mobile device or not.
+	 */
 	public class DeviceUtil
 	{
 		public static function isWindows() : Boolean

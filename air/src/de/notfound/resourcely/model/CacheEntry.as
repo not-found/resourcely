@@ -7,6 +7,10 @@ package de.notfound.resourcely.model
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
 
+	/**
+	 * This class is meant for internal use only and contains cached data.
+	 * @private
+	 */
 	public class CacheEntry
 	{
 		private var _fileDimensions : Rectangle;
@@ -24,7 +28,7 @@ package de.notfound.resourcely.model
 			
 			trace(++num);
 		}
-
+		
 		public function addReference(image : Image) : void
 		{
 			_refs[image] = true;
@@ -35,7 +39,8 @@ package de.notfound.resourcely.model
 			_refs[image] = null;
 			delete _refs[image];
 		}
-
+		
+		//Removes all references linked to this entry, the bitmap data it contains and frees the memory used by the bitmap data
 		public function clear() : void
 		{
 			_fileDimensions = null;
