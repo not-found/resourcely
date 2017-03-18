@@ -33,5 +33,11 @@ package de.notfound.resourcely.config
 		 * @default Capabilities.screenDPI
 		 */
 		public var deviceDpi : Number;
+		
+		/**
+		 * The maximum value in byte resourcely is allowed to use for its cache size.
+		 * @default By default resourcely will use every space available.
+		 */
+		public var maxCacheSize : Number;
 	}
 }

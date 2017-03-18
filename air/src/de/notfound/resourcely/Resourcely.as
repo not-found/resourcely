@@ -1,5 +1,6 @@
 package de.notfound.resourcely
 {
+	import de.notfound.resourcely.config.cache.LRUCache;
 	import de.notfound.resourcely.config.ResourcelyConfig;
 	import de.notfound.resourcely.config.ResourcelyConfigBuilder;
 	import de.notfound.resourcely.file.dimension.ImageFileDimensionExtractor;
@@ -19,6 +20,7 @@ package de.notfound.resourcely
 	import flash.filesystem.File;
 	import flash.geom.Rectangle;
 	import flash.net.URLRequest;
+	import flash.system.System;
 	import flash.utils.Dictionary;
 
 	public class Resourcely
@@ -28,7 +30,8 @@ package de.notfound.resourcely
 		
 		private var _config : ResourcelyConfig;
 		private var _densities : Vector.<Density>;
-		private var _cache : Dictionary;
+		private var _cache : LRUCache;
+		private var _cacheEntries : Dictionary;
 		private var _paths : Dictionary;
 		private var _imageFileMapping : Dictionary;
 		private var _imageDimensionExtractor : ImageFileDimensionExtractor;
@@ -38,7 +41,8 @@ package de.notfound.resourcely
 		private var _loaderWorking : Boolean;
 		private var _orientation : int;
 		private var _stage : Stage;
-		
+		private var _usedMemory : Number;
+
 		/**
 		 * Used to load image resources. Resourcely is meant to be used as signleton, 
 		 * so you can't create instances from it and should use getInstance() instead.
@@ -49,7 +53,7 @@ package de.notfound.resourcely
 				throw new Error("Singleton class. Can't create new instance. Use getInstance() instead.");
 
 			_densities = new Vector.<Density>();
-			_cache = new Dictionary();
+			_cacheEntries = new Dictionary();
 			_paths = new Dictionary();
 			_imageFileMapping = new Dictionary(true);
 
@@ -57,13 +61,14 @@ package de.notfound.resourcely
 			_imageDimensionExtractor.addEventListener(Event.COMPLETE, handleDimensionExtractionComplete);
 			_imageDimensionExtractorQueue = new Array();
 			_orientation = Orientation.PORTRAIT;
-			
+
+			_usedMemory = 0;
 			_loader = new Loader();
 			_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handleLoadDataComplete);
 			_loaderQueue = new Array();
 			_loaderWorking = false;
 		}
-		
+
 		/**
 		 * Returns a resourcely instance.
 		 */
@@ -77,7 +82,7 @@ package de.notfound.resourcely
 
 			return _instance;
 		}
-		
+
 		/**
 		 * Use this to initialize resourcely. This is needed to it'll be able to detect device orientation changes.
 		 * @param stage The stage object belonging to the display list.
@@ -86,11 +91,12 @@ package de.notfound.resourcely
 		public function init(stage : Stage, config : ResourcelyConfig = null) : void
 		{
 			_config = config != null ? config : ResourcelyConfigBuilder.getDefault().build();
-
+			
 			initStage(stage);
 			initDensities();
+			initCache();
 		}
-		
+
 		/**
 		 * Locates and returns an image matching the fileName supplied depending on the devices dpi and orientation.
 		 * @param fileName The file name of the image file including extension. For example: <code>img.jpg</code>
@@ -125,9 +131,9 @@ package de.notfound.resourcely
 
 		private function resolvePath(fileName : String, orientation : int) : Path
 		{
-			if(_paths[fileName + orientation] != null)
+			if (_paths[fileName + orientation] != null)
 				return _paths[fileName + orientation];
-				
+
 			var resDir : File = _config.resourceDirectory;
 			var postFix : String = orientation == Orientation.LANDSCAPE ? Orientation.POSTIFX_LANDSCAPE : Orientation.POSTIFX_PORTRAIT;
 
@@ -145,7 +151,7 @@ package de.notfound.resourcely
 							if (FileUtil.isImageFile(file.extension) == false)
 								throw new Error("Couldn't load " + file.nativePath + " because it isn't an image file.");
 						}
-						
+
 						var path : Path = new Path(file, _densities[i]);
 						_paths[fileName + orientation] = path;
 						return path;
@@ -159,17 +165,17 @@ package de.notfound.resourcely
 
 			return null;
 		}
-		
+
 		/**
 		 * Calling this method will cause resourcely to load the image file linked to the image instance.
 		 * @param image The image which should its image data get loaded.
-		 */		
+		 */
 		public function load(image : Image) : void
 		{
 			registerReference(image);
 
 			var file : File = _imageFileMapping[image];
-			var cacheEntry : CacheEntry = _cache[file];
+			var cacheEntry : CacheEntry = _cacheEntries[file];
 
 			if (cacheEntry.fileDimensions == null)
 			{
@@ -220,6 +226,9 @@ package de.notfound.resourcely
 			if (_loaderQueue.length > 0 && !_loaderWorking)
 			{
 				var file : File = _loaderQueue[0];
+				var cacheEntry : CacheEntry = _cacheEntries[file];
+
+				_cache.cleanCache(cacheEntry.estimatedSize);
 				_loader.load(new URLRequest(file.url));
 			}
 		}
@@ -239,11 +248,10 @@ package de.notfound.resourcely
 
 		private function setOrientation() : void
 		{
-			if(DeviceUtil.isDesktop())
+			if (DeviceUtil.isDesktop())
 				_orientation = Orientation.PORTRAIT;
 			else
 				_orientation = _stage.fullScreenWidth > _stage.fullScreenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
-				
 		}
 
 		private function initDensities() : void
@@ -257,36 +265,41 @@ package de.notfound.resourcely
 
 			_densities = _config.resourceLocationStrategy.getOrder(_densities);
 		}
-
+		
+		private function initCache() : void
+		{
+			_cache = new LRUCache(_config.maxCacheSize);
+		}
+		
 		private function refresh() : void
 		{
 			for (var image : Image in _imageFileMapping)
 			{
 				var oldFile : File = _imageFileMapping[image];
 				var newFile : File = resolveOrientation(oldFile.name).file;
-				var cacheEntry : CacheEntry = _cache[oldFile];
-				
+				var cacheEntry : CacheEntry = _cacheEntries[oldFile];
+
 				_imageFileMapping[image] = newFile;
-				
-				cacheEntry.clear();
+
+				cacheEntry.unlink();
 				load(image);
 			}
 		}
-
+		
 		private function registerReference(image : Image) : void
 		{
 			var file : File = _imageFileMapping[image];
-			if (_cache[file] == null)
-				_cache[file] = new CacheEntry();
+			if (_cacheEntries[file] == null)
+				_cacheEntries[file] = new CacheEntry();
 
-			var cacheEntry : CacheEntry = _cache[file];
+			var cacheEntry : CacheEntry = _cacheEntries[file];
 			cacheEntry.addReference(image);
 		}
 
 		private function removeReference(image : Image) : void
 		{
 			var file : File = _imageFileMapping[image];
-			var cacheEntry : CacheEntry = _cache[file];
+			var cacheEntry : CacheEntry = _cacheEntries[file];
 			cacheEntry.removeReference(image);
 		}
 
@@ -309,16 +322,18 @@ package de.notfound.resourcely
 			var loaderInfo : LoaderInfo = LoaderInfo(event.target);
 
 			var file : File = _loaderQueue.shift();
-			var cacheEntry : CacheEntry = _cache[file];
-
+			var cacheEntry : CacheEntry = _cacheEntries[file];
+			
 			cacheEntry.data = Bitmap(loaderInfo.content).bitmapData;
+			_cache.insert(file.url, cacheEntry);
+			
 			extractDimensions();
 		}
 
 		private function handleDimensionExtractionComplete(event : Event) : void
 		{
 			var file : File = _imageDimensionExtractorQueue.shift();
-			var cacheEntry : CacheEntry = _cache[file];
+			var cacheEntry : CacheEntry = _cacheEntries[file];
 			var dimensions : Rectangle = new Rectangle(0, 0, _imageDimensionExtractor.width, _imageDimensionExtractor.height);
 
 			cacheEntry.fileDimensions = dimensions;

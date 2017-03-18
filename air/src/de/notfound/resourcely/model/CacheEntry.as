@@ -5,7 +5,6 @@ package de.notfound.resourcely.model
 	import flash.display.BitmapData;
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
-	import flash.utils.getTimer;
 
 	/**
 	 * This class is meant for internal use only and contains cached data.
@@ -16,14 +15,12 @@ package de.notfound.resourcely.model
 		private var _fileDimensions : Rectangle;
 		private var _data : BitmapData;
 		private var _estimatedSize : Number;
-		private var _timestamp : int;
 		private var _refs : Dictionary;
 		
 		public static var num : uint = 0;
 		
 		public function CacheEntry()
 		{
-			_timestamp = getTimer();
 			_refs = new Dictionary(true);
 			
 			trace(++num);
@@ -40,22 +37,26 @@ package de.notfound.resourcely.model
 			delete _refs[image];
 		}
 		
-		//Removes all references linked to this entry, the bitmap data it contains and frees the memory used by the bitmap data
+		//Removes the bitmap data it contains and frees the memory used by the bitmap data
 		public function clear() : void
 		{
-			_fileDimensions = null;
+			unlink();
+			_data.dispose();
+			_data = null;
+		}
+		
+		//Removes all references linked to this entry
+		public function unlink() : void
+		{
 			for (var image : Image in _refs)
 			{
 				image.clear();
 				removeReference(image);
 			}
-			_data.dispose();
-			_data = null;
 		}
-
+		
 		public function get data() : BitmapData
 		{
-			_timestamp = getTimer();
 			return _data;
 		}
 
@@ -67,21 +68,6 @@ package de.notfound.resourcely.model
 			{
 				ref.bitmapData = bitmapData;
 			}
-		}
-
-		public function get timestamp() : int
-		{
-			return _timestamp;
-		}
-
-		public function get numRefs() : uint
-		{
-			var numRefs : uint = 0;
-			for (var key : Image in _refs)
-			{
-				numRefs++;
-			}
-			return numRefs;
 		}
 
 		public function get fileDimensions() : Rectangle
@@ -98,6 +84,11 @@ package de.notfound.resourcely.model
 			{
 				ref.fileDimensions = fileDimensions;
 			}
+		}
+
+		public function get estimatedSize() : Number
+		{
+			return _estimatedSize;
 		}
 	}
 }

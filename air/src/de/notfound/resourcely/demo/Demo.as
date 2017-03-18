@@ -1,5 +1,7 @@
 package de.notfound.resourcely.demo
 {
+	import de.notfound.resourcely.config.ResourcelyConfigBuilder;
+	import de.notfound.resourcely.config.ResourcelyConfig;
 	import flash.display.StageScaleMode;
 	import flash.display.StageAlign;
 	import de.notfound.resourcely.Resourcely;
@@ -35,6 +37,7 @@ package de.notfound.resourcely.demo
 
 		private function test1() : void
 		{
+			var config : ResourcelyConfig = ResourcelyConfigBuilder.getDefault().setMaxCacheSize(50000).build();
 			Resourcely.getInstance().init(stage);
 
 			_time = getTimer();

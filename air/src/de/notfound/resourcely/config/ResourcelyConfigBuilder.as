@@ -31,6 +31,11 @@ package de.notfound.resourcely.config
 		 * Default device dpi value.
 		 */
 		public static const DEVICE_DPI_DEFAULT : Number = Capabilities.screenDPI;
+
+		/**
+		 * Default max cache size. NaN will cause resourcely to use the max available free space.
+		 */
+		public static const MAX_CACHE_SIZE_DEFAULT : Number = NaN;
 		
 		private var _config : ResourcelyConfig;
 
@@ -80,6 +85,16 @@ package de.notfound.resourcely.config
 		}
 		
 		/**
+		 * Sets the max allowed size of resourcelys internal cache in byte.
+		 * @param maxCacheSize Max. allowed cache size in byte.
+		 */
+		public function setMaxCacheSize(maxCacheSize : Number) : ResourcelyConfigBuilder
+		{
+			_config.maxCacheSize = maxCacheSize;
+			return this;
+		}
+		
+		/**
 		 * Builds the config.
 		 * @return A config file for the use with resourcely.
 		 */
@@ -98,6 +113,7 @@ package de.notfound.resourcely.config
 			return builder.setResourcePath(RESOURCE_PATH_DEFAULT)
 			.setResourceLocationStrategy(RESOURCE_LOCATION_STRATEGY_DEFAULT)
 			.setResourceScalingStrategy(RESOURCE_SCALING_STRATEGY_DEFAULT)
+			.setMaxCacheSize(MAX_CACHE_SIZE_DEFAULT)
 			.setDeviceDpi(DEVICE_DPI_DEFAULT);
 		}
 	}
