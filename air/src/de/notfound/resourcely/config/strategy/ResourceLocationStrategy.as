@@ -2,8 +2,6 @@ package de.notfound.resourcely.config.strategy
 {
 	import de.notfound.resourcely.model.Density;
 
-	import flash.system.Capabilities;
-
 	/**
 	 * Abstract class that defines methods resourcely uses to locate image resources.
 	 */
@@ -17,15 +15,15 @@ package de.notfound.resourcely.config.strategy
 		 * @param densities A list of Densities, ordered ascending by dpi value.
 		 * @return Should return the list in the order resourcely should look through the resource folders.
 		 */
-		public function getOrder(densities : Vector.<Density>) : Vector.<Density>
+		public function getOrder(deviceDpi : Number, densities : Vector.<Density>) : Vector.<Density>
 		{
 			throw new Error("This method has to be implemented.");
 		}
 		
 		//Find the density which is the next best guess compared to the current screenDPI value.
-		protected function getNextBestDensity(densities : Vector.<Density>) : Density
+		protected function getNextBestDensity(deviceDpi : Number, densities : Vector.<Density>) : Density
 		{
-			var currentDpi : Number = Capabilities.screenDPI;
+			var currentDpi : Number = deviceDpi;
 			var dpiDif : Number = Number.MAX_VALUE;
 			var tempDif : Number = dpiDif;
 			var nextBestDensity : Density;

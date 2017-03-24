@@ -20,7 +20,6 @@ package de.notfound.resourcely.config.cache
 		public function LRUCache(maxSize : Number)
 		{
 			_maxSize = maxSize;
-			trace('_maxSize: ' + (_maxSize));
 			_size = 0;
 			_hashMap = new Dictionary();
 		}
@@ -28,9 +27,12 @@ package de.notfound.resourcely.config.cache
 		public function insert(key : String, value : CacheEntry) : void
 		{
 			var node : DoubleLinkedNode = new DoubleLinkedNode(key, value, null, null);
+			
 			node.next = _front;
 			if (_front != null)
 				_front.prev = node;
+			if(_front != null && _front.next == null)
+				_end = _front;
 			_front = node;
 
 			_hashMap[key] = value;
@@ -62,15 +64,21 @@ package de.notfound.resourcely.config.cache
 			var calcFreeSpace : Function = function() : Number
 			{
 				var freeSpace : Number = isNaN(_maxSize) ? System.freeMemory : _maxSize - _size;
+				trace("freeSpace: " + freeSpace);
 				return freeSpace;
 			};
 
+			trace(' neededSpace: ' + (neededSpace));
 			while (calcFreeSpace() < neededSpace)
 			{
 				var entry : CacheEntry = removeItem();
 				
 				if(entry == null)
+				{
+					
+					trace("entry == null");
 					break;
+				}
 					
 				entry.clear();
 				changeSize(-entry.estimatedSize);
@@ -97,6 +105,7 @@ package de.notfound.resourcely.config.cache
 		private function changeSize(delta : Number) : void
 		{
 			_size = Math.max(0, _size + delta);
+			trace("cacheSize: " + _size);
 		}
 	}
 }

@@ -150,11 +150,12 @@ package de.notfound.resourcely
 						{
 							if (FileUtil.isImageFile(file.extension) == false)
 								throw new Error("Couldn't load " + file.nativePath + " because it isn't an image file.");
+
+							var path : Path = new Path(file, _densities[i]);
+							_paths[fileName + orientation] = path;
+							return path;
 						}
 
-						var path : Path = new Path(file, _densities[i]);
-						_paths[fileName + orientation] = path;
-						return path;
 					}
 				}
 			}
@@ -229,6 +230,7 @@ package de.notfound.resourcely
 				var cacheEntry : CacheEntry = _cacheEntries[file];
 
 				_cache.cleanCache(cacheEntry.estimatedSize);
+				trace("file.url: " + file.url);
 				_loader.load(new URLRequest(file.url));
 			}
 		}
@@ -263,7 +265,7 @@ package de.notfound.resourcely
 			_densities.push(new Density(Density.XXHDPI, Density.XXHDPI_QUALIFIER));
 			_densities.push(new Density(Density.XXXHDPI, Density.XXXHDPI_QUALIFIER));
 
-			_densities = _config.resourceLocationStrategy.getOrder(_densities);
+			_densities = _config.resourceLocationStrategy.getOrder(_config.deviceDpi, _densities);
 		}
 		
 		private function initCache() : void
@@ -273,8 +275,9 @@ package de.notfound.resourcely
 		
 		private function refresh() : void
 		{
-			for (var image : Image in _imageFileMapping)
+			for (var key : Object in _imageFileMapping)
 			{
+				var image : Image = Image(key);
 				var oldFile : File = _imageFileMapping[image];
 				var newFile : File = resolveOrientation(oldFile.name).file;
 				var cacheEntry : CacheEntry = _cacheEntries[oldFile];

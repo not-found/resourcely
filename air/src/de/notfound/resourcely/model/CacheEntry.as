@@ -17,13 +17,9 @@ package de.notfound.resourcely.model
 		private var _estimatedSize : Number;
 		private var _refs : Dictionary;
 		
-		public static var num : uint = 0;
-		
 		public function CacheEntry()
 		{
 			_refs = new Dictionary(true);
-			
-			trace(++num);
 		}
 		
 		public function addReference(image : Image) : void
@@ -48,8 +44,9 @@ package de.notfound.resourcely.model
 		//Removes all references linked to this entry
 		public function unlink() : void
 		{
-			for (var image : Image in _refs)
+			for (var key : Object in _refs)
 			{
+				var image : Image = Image(key);
 				image.clear();
 				removeReference(image);
 			}
@@ -63,9 +60,10 @@ package de.notfound.resourcely.model
 		public function set data(bitmapData : BitmapData) : void
 		{
 			_data = bitmapData;
-
-			for (var ref : Image in _refs)
+			
+			for (var key : Object in _refs)
 			{
+				var ref : Image = Image(key);
 				ref.bitmapData = bitmapData;
 			}
 		}
@@ -80,8 +78,9 @@ package de.notfound.resourcely.model
 			_fileDimensions = fileDimensions;
 			_estimatedSize = fileDimensions.width * fileDimensions.height * 4;
 
-			for (var ref : Image in _refs)
+			for (var key : Object in _refs)
 			{
+				var ref : Image = Image(key);
 				ref.fileDimensions = fileDimensions;
 			}
 		}
